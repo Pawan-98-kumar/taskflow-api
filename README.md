@@ -1,19 +1,17 @@
 # TaskFlow API
 
-A Task Management REST API built using Node.js, Express.js, and MongoDB. It allows users to register, log in, and manage their personal tasks securely using JWT authentication.
+A Task Management REST API built using **Node.js, Express.js, and MongoDB**. It allows users to register, log in, and securely manage their personal tasks using JWT authentication.
 
 ## Features
 
 - User registration and login
-- Password hashing using bcrypt
+- Password hashing using bcryptjs
 - JWT-based authentication
-- Create new tasks
-- Get all tasks
-- Get a task by ID
-- Update tasks
-- Delete tasks
+- Create, read, update, and delete tasks
+- Get all tasks belonging to the logged-in user
 - User-specific task management
 - Input validation and error handling
+- Protected task routes
 
 ## Technologies Used
 
@@ -42,30 +40,34 @@ taskflow-api/
 ├── .gitignore
 ├── package.json
 ├── package-lock.json
-└── server.js
+├── server.js
+├── README.md
+└── TaskFlow API.postman_collection.json
 ```
 
-## Installation
+## Installation and Setup
 
-1. Clone the repository:
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Pawan-98-kumar/taskflow-api.git
 ```
 
-2. Open the project folder:
+### 2. Navigate to the project folder
 
 ```bash
 cd taskflow-api
 ```
 
-3. Install dependencies:
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-4. Create a `.env` file in the project root and add:
+### 4. Configure environment variables
+
+Create a `.env` file in the project root:
 
 ```env
 PORT=3000
@@ -73,54 +75,84 @@ MONGODB_URL=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 ```
 
-5. Start the server:
+Replace the placeholder values with your own MongoDB connection string and JWT secret.
+
+### 5. Start the server
 
 ```bash
 node server.js
 ```
 
-The server will run on port 3000 by default.
+The server runs on port `3000` by default.
 
 ## API Endpoints
 
-### Authentication
+### Authentication Routes
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/auth/register` | Register a new user |
-| POST | `/auth/login` | Log in a user |
+| Method | Endpoint         | Description             |
+| ------ | ---------------- | ----------------------- |
+| POST   | `/auth/register` | Register a new user     |
+| POST   | `/auth/login`    | Log in an existing user |
 
-### Tasks
+### Task Routes
 
-All task endpoints require a valid JWT Bearer token.
+All task routes require JWT authentication.
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/tasks` | Create a task |
-| GET | `/tasks` | Get all user's tasks |
-| GET | `/tasks/:id` | Get a task by ID |
-| PATCH | `/tasks/:id` | Update a task |
-| DELETE | `/tasks/:id` | Delete a task |
+| Method | Endpoint     | Description          |
+| ------ | ------------ | -------------------- |
+| POST   | `/tasks`     | Create a new task    |
+| GET    | `/tasks`     | Get all user's tasks |
+| GET    | `/tasks/:id` | Get a task by ID     |
+| PATCH  | `/tasks/:id` | Update a task        |
+| DELETE | `/tasks/:id` | Delete a task        |
 
 ## Authentication
 
-After logging in, use the received JWT token in the Authorization header for task requests:
+After successful login, the API returns a JWT token.
+
+Include this token in the Authorization header when accessing protected task routes:
 
 ```text
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
 
+## Example Request
+
+### Create a Task
+
+**POST** `/tasks`
+
+Request body:
+
+```json
+{
+  "title": "Learn JavaScript",
+  "description": "Practice backend development",
+  "completed": false
+}
+```
+
+## Postman Collection
+
+A Postman collection is included in this repository to test the API endpoints.
+
+Import the following file into Postman:
+
+`TaskFlow API.postman_collection.json`
+
+The collection includes requests for user registration, login, and task management.
+
 ## Environment Variables
 
-| Variable | Description |
-|---|---|
-| PORT | Server port |
-| MONGODB_URL | MongoDB connection string |
-| JWT_SECRET | Secret key used to verify JWT tokens |
+| Variable      | Description                          |
+| ------------- | ------------------------------------ |
+| `PORT`        | Port on which the server runs        |
+| `MONGODB_URL` | MongoDB connection string            |
+| `JWT_SECRET`  | Secret key used for JWT verification |
 
 ## Author
 
-Pawan Kumar
+**Pawan Kumar**
 
 ## License
 
