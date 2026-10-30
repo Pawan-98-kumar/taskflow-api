@@ -5,25 +5,24 @@ const jwt = require('jsonwebtoken');
 const registerUser = async (req,res)=>{
     try{
         const { name, email, password } = req.body;
-
-if (typeof name !== 'string' ||
-    typeof email !== 'string' ||
-    typeof password !== 'string' ||
-    !name.trim() ||
-    !email.trim() ||
-    !password.trim()) {
-      return res.status(400).json({
-        message: "Enter email, name and password"
-    });
+    
+        // check all field are provided
+     if (typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof password !== 'string' ||
+       !name.trim() ||
+      !email.trim() ||
+      !password.trim()) {
+      return res.status(400).json({message: "Enter email, name and password" });
 }
 
-const cleanEmail = email.trim().toLowerCase();
+      const cleanEmail = email.trim().toLowerCase();
 
-if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-    return res.status(400).json({
-        message: "Enter a valid email"
-    });
-}
+  // email format
+     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    return res.status(400).json({message: "Enter a valid email"});
+}     
+      // check minimun password length
         if (password.length < 8) {
          return res.status(400).json({ message: "Password must be at least 8 characters long"});
             }
@@ -32,7 +31,8 @@ if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
          if (existingUser) {
           return res.status(409).json({message: 'Email already registered'});
             }
- 
+       
+            // hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({name:name.trim(),email:cleanEmail,password: hashedPassword});
         await user.save();
@@ -49,20 +49,16 @@ const loginUser = async(req,res)=>{
     try{
       const { email, password } = req.body;
 
-if (
-    typeof email !== 'string' ||
-    typeof password !== 'string' ||
-    !email.trim() ||
-    !password.trim()
-) {
-    return res.status(400).json({
-        message: "Enter email and password"
-    });
-}
+        if ( typeof email !== 'string' ||
+              typeof password !== 'string' ||
+          !email.trim() ||
+         !password.trim()){
+       return res.status(400).json({message: "Enter email and password"});
+      }
 
-const cleanEmail = email.trim().toLowerCase();
+      const cleanEmail = email.trim().toLowerCase();
 
-const user = await User.findOne({ email: cleanEmail });
+      const user = await User.findOne({ email: cleanEmail });
       if(!user){
         return res.status(401).json({message:"Invalid email or password"});
       }

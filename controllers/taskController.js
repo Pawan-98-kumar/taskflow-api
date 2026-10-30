@@ -5,6 +5,10 @@ const mongoose = require('mongoose');
 const createTask = async (req, res) => {
     try {
         const { title, description } = req.body;
+        if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+           return res.status(400).json({ message: "Invalid request body" });
+        }
+
         if (typeof title !== 'string' ||
             typeof description !== 'string' ||
             !title.trim() ||
@@ -12,18 +16,16 @@ const createTask = async (req, res) => {
             return res.status(400).json({ message: "Title and description are required"});
            }
 
-        const task = new Task({
-            title: title.trim(),
+        const task = new Task({title: title.trim(),
             description: description.trim(),
-            userId: req.user.userId});
+             userId: req.user.userId});
 
         const savedTask = await task.save();
         return res.status(201).json(savedTask);
       
     } catch (err) {
         if (err.name === 'ValidationError' || err.name === 'CastError') {
-            return res.status(400).json({
-                message: "Invalid task data"});
+            return res.status(400).json({message: "Invalid task data"});
         }
            console.error("Create task error:", err.message);
             return res.status(500).json({message: "Internal server error"});
@@ -38,9 +40,7 @@ const getAllTasks = async (req, res) => {
 
     } catch (error) {
         console.error("Get all tasks error:", error.message);
-        return res.status(500).json({
-            message: "Internal server error"
-        });
+        return res.status(500).json({message: "Internal server error"});
     }
 };
 
@@ -67,6 +67,7 @@ const getTaskById = async(req,res)=>{
 // update task 
 const updateTask = async (req, res) => {
     try {
+        // check task id is valid 
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
             return res.status(400).json({ message: "Invalid ID" });
         }
@@ -76,6 +77,7 @@ const updateTask = async (req, res) => {
 
          const { title, description, completed } = req.body;
 
+      //  atleast on field is required to updation 
           if( title === undefined &&
             description === undefined &&
             completed === undefined) {
@@ -83,6 +85,8 @@ const updateTask = async (req, res) => {
                 message: "At least one field is required to update"
             });
         }
+
+    // validate the user value
            if( (title !== undefined &&
             (typeof title !== 'string' || !title.trim())) ||
             (description !== undefined &&
@@ -91,25 +95,25 @@ const updateTask = async (req, res) => {
                 typeof completed !== 'boolean')){
             return res.status(400).json({ message: "Invalid input" });
         }
+
+        // store only field need to updated
         const updates = {};
         if (title !== undefined) {
-     updates.title = title.trim();}
+         updates.title = title.trim();}
 
-    if (description !== undefined) {
-    updates.description = description.trim();}
+        if (description !== undefined) {
+         updates.description = description.trim();}
 
-   if (completed !== undefined) {
-    updates.completed = completed;}
+         if (completed !== undefined) {
+        updates.completed = completed;}
 
-      const task = await Task.findOneAndUpdate({
-        _id: req.params.id,
+       const task = await Task.findOneAndUpdate({_id: req.params.id,
         userId: req.user.userId},updates,{ new: true, runValidators: true });
 
         if (!task) {
             return res.status(404).json({ message: "Task not found" });
         }
-
-      return res.status(200).json(task);
+        return res.status(200).json(task);
 
     }  catch (err) {
     if (err.name === 'ValidationError' || err.name === 'CastError') {
