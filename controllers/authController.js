@@ -4,16 +4,26 @@ const jwt = require('jsonwebtoken');
 // register user 
 const registerUser = async (req,res)=>{
     try{
-        const {name,email,password} = req.body;
+        const { name, email, password } = req.body;
 
-        const cleanEmail = email.trim().toLowerCase();
-        if (typeof name !== 'string' || typeof email !== 'string' || typeof password !== 'string' ||
-             !name.trim() || !email.trim() || !password.trim()){
-             return res.status(400).json({message:"Enter email,name,password"})
-        }
-          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-          return res.status(400).json({message: "Enter a valid email"});
-        }
+if (typeof name !== 'string' ||
+    typeof email !== 'string' ||
+    typeof password !== 'string' ||
+    !name.trim() ||
+    !email.trim() ||
+    !password.trim()) {
+      return res.status(400).json({
+        message: "Enter email, name and password"
+    });
+}
+
+const cleanEmail = email.trim().toLowerCase();
+
+if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
+    return res.status(400).json({
+        message: "Enter a valid email"
+    });
+}
         if (password.length < 8) {
          return res.status(400).json({ message: "Password must be at least 8 characters long"});
             }
@@ -37,11 +47,22 @@ const registerUser = async (req,res)=>{
 // login user
 const loginUser = async(req,res)=>{
     try{
-        const {email,password}=req.body;
-        if (!email || !password) {
-    return res.status(400).json({ message: "Enter email and password"});
+      const { email, password } = req.body;
+
+if (
+    typeof email !== 'string' ||
+    typeof password !== 'string' ||
+    !email.trim() ||
+    !password.trim()
+) {
+    return res.status(400).json({
+        message: "Enter email and password"
+    });
 }
-      const user = await User.findOne({ email });
+
+const cleanEmail = email.trim().toLowerCase();
+
+const user = await User.findOne({ email: cleanEmail });
       if(!user){
         return res.status(401).json({message:"Invalid email or password"});
       }
